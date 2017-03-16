@@ -1,0 +1,7 @@
+fcn.com gmail.com aspmx.l.google.com 25
+gmail.com gmail.com imap.gmail.com 465
+fcn.com example.com kansas.cs.rit.edu 9999
+example.com gmail.com aspmx.l.google.com 25
+example.com fcn.com glados.cs.rit.edu 9999
+fcn.com fcn.com glados.cs.rit.edu 9999
+example.com example.com kansas.cs.rit.edu 9999
