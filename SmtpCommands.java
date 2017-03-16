@@ -1,3 +1,6 @@
+/*
+ * SmtpCommands.java
+ */
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,12 +11,7 @@ import java.util.List;
  * @author Krish Godiawala
  */
 public class SmtpCommands {
-
-	/**
-	 * 
-	 * All the commands of SMTP
-	 *
-	 */
+	// List of all SMTP commands
 	public String HELO;
 	public String MAIL_FROM;
 	public List<String> RCPT_TO;
@@ -24,6 +22,7 @@ public class SmtpCommands {
 		this.RCPT_TO = new ArrayList<String>();
 	}
 
+	// adding the receivers
 	public void addReceivers(List<String> receivers) {
 		for (int i = 0; i < receivers.size(); i++) {
 			this.RCPT_TO.add("RCPT TO:<" + receivers.get(i) + ">");

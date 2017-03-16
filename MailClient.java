@@ -27,6 +27,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+/**
+* This class is handles client side
+* 
+* @author Apurwa Dandekar
+* @author Krish Godiawala
+*/
+
 public class MailClient {
 	JFrame loginFrame = new JFrame("Login");
 	static JLabel captionLabel = new JLabel("Login to the server : ");
@@ -65,6 +72,9 @@ public class MailClient {
 		mailWindow.createLoginPage();
 	}
 
+	/**
+	 * Create a login page
+	 */
 	void createLoginPage() {
 		JPanel mainJPanel = new JPanel();
 		
@@ -146,6 +156,9 @@ public class MailClient {
 
 	}
 
+	/**
+	 * create a homepage 
+	 */
  void createHomePage(){
 	 	JPanel mainJPanel = new JPanel();
 	 	JLabel userLabel = new JLabel("Hello "+clientEmailAddrees);
@@ -176,7 +189,7 @@ public class MailClient {
 		sendToPanel.setMaximumSize(new Dimension(1550, 30));
 		sendToPanel.setLayout(new BoxLayout(sendToPanel, BoxLayout.X_AXIS));
 		sendToPanel.setBackground(new java.awt.Color(235, 204, 255));
-		composeButton composeAction = new composeButton();
+		ComposeButton composeAction = new ComposeButton();
 		composeButton.addActionListener(composeAction);
 		composeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -189,7 +202,7 @@ public class MailClient {
 		subPanel.setMaximumSize(new Dimension(1550, 700));
 		subPanel.setLayout(new BoxLayout(subPanel, BoxLayout.X_AXIS));
 		subPanel.setBackground(new java.awt.Color(235, 204, 255));
-		inboxAButton inboxAction = new inboxAButton();
+		InboxAButton inboxAction = new InboxAButton();
 		inboxButton.addActionListener(inboxAction);
 		inboxButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
@@ -215,6 +228,9 @@ public class MailClient {
 		homeFrame.setVisible(true);
 	 
  }
+ /**
+	 * Create a compose mail window
+	 */
 	void composeMailWindow() {
 		JPanel mainJPanel = new JPanel();
 		JLabel userLabel = new JLabel("Hello "+clientEmailAddrees);
@@ -359,7 +375,7 @@ public class MailClient {
 		}
 	}
 
-	// Actionlistener for Cancel Button
+	// Actionlistener for Login Button
 	private class LoginButton implements ActionListener {
 		private String amountEntered;
 
@@ -416,8 +432,8 @@ public class MailClient {
 
 	}
 
-	// Actionlistener for Cancel Button
-	private class composeButton implements ActionListener {
+	// Actionlistener for Compose Button
+	private class ComposeButton implements ActionListener {
 		private String amountEntered;
 
 		/*
@@ -437,8 +453,8 @@ public class MailClient {
 		}
 	}
 
-	// Actionlistener for Cancel Button
-	private class inboxAButton implements ActionListener {
+	// Actionlistener for Inbox Button
+	private class InboxAButton implements ActionListener {
 		private String amountEntered;
 
 		/*
@@ -483,7 +499,9 @@ public class MailClient {
 			}
 		}
 	}
-
+	/**
+	 * Create an email packet
+	 */
 	Email createPacket(List<String> listOfEmail) {
 		String emailBody = body.getText();
 		String emailSubject = subject.getText();
@@ -495,7 +513,10 @@ public class MailClient {
 		return packet;
 
 	}
-
+	
+	/**
+	 * Check no. of recipient 
+	 */
 	List<String> checkNoOfEmail(String sendTo) {
 		String[] addresses = null;
 		if (sendTo.contains(";")) {
@@ -514,6 +535,9 @@ public class MailClient {
 		return addressList;
 	}
 
+	/**
+	 * Validate email address
+	 */
 	boolean validateEmail(String email) {
 		String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
 				+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";

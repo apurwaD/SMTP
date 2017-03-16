@@ -1,0 +1,22 @@
+Compile all the files on the server side and the client side
+Start the SmtpServer on glados with command java SmtpServer fcn
+Start the client on the client machine with command java MailClient glados.cs.rit.edu
+
+Start the SmtpServer on kansas with command java SmtpServer example
+Start the client on the client machine with command java MailClient kansas.cs.rit.edu
+
+You can also run the server on differ machines, but you need to configure the utils.txt file with the servername and the corresponding IPADDRESS
+Some of the authorized userid password for fcn server are
+username: abc@fcn.com password:abc
+username: user@fcn.com password:user
+
+Some of the authorized userid password for example server are
+username: abc@fcn.com password:abc
+username: user@fcn.com password:user
+
+Some of the authorized userid password for example are
+username: fcn@example.com password:fcn
+username: abc@example.com password:abc
+
+
+

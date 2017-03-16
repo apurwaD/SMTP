@@ -1,7 +1,14 @@
+/*
+ * Domains.java
+ */
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+/**
+ * @author Apurwa Dandekar
+ * @author Krish Godiawala
+ */
 public class Domains {
 	public static final String FCN_DOMAIN = "fcn.com";
 	public static final String EXAMPLE_DOMAIN = "example.com";

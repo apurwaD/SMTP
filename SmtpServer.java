@@ -1,3 +1,6 @@
+/*
+ * SmtpServer.java
+ */
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -7,9 +10,6 @@ import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -20,27 +20,43 @@ import javax.net.ssl.SSLSocketFactory;
  * @author Krish Godiawala
  */
 public class SmtpServer extends Thread {
+	// Fields
 	private static String serverName;
 	static Map<String, String> hosts;
 	public static final int CLIENT_LISTEN_PORT = 5555;
 	private Socket server;
 	private static Map<String, HashMap<Integer, Email>> listOfEmail;
 	static Map<String, Integer> activeUsers;
+	// Static initializer block
 	static {
 		listOfEmail = new HashMap<String, HashMap<Integer, Email>>();
 		activeUsers = new HashMap<String, Integer>();
 	}
 
+	/**
+	 * Parameterized Constructor
+	 * 
+	 * @param Servername
+	 * @param number
+	 */
 	public SmtpServer(String Servername, int number) {
 		SmtpServer.serverName = Servername;
 		hosts = new HashMap<String, String>();
 	}
 
+	/**
+	 * Parameterized Constructor
+	 * 
+	 * @param socket
+	 */
 	public SmtpServer(Socket socket) {
 		this.server = socket;
 
 	}
 
+	/**
+	 * Default Constructor
+	 */
 	public SmtpServer() {
 
 	}
@@ -65,11 +81,9 @@ public class SmtpServer extends Thread {
 	public void incomingSmtpServerConnection() {
 		try {
 			ServerSocket sock = new ServerSocket(Domains.PERSON_SMTP_PORT);
-			// System.out.println("Waiting to connect");
 			while (true) {
 				Socket serv = sock.accept();
-				// System.out.println("Connected");
-				new Incom(serv, serverName, listOfEmail);
+				new IncomingSmtpConnection(serv, serverName, listOfEmail);
 			}
 
 		} catch (IOException e) {
@@ -81,8 +95,11 @@ public class SmtpServer extends Thread {
 	 * For initiating outgoing connection
 	 * 
 	 * @param email
+	 *            The email to be sent
 	 * @param userID
+	 *            The sender UserName
 	 * @param Password
+	 *            The sender Password
 	 */
 	public void outgoingSmtpServerConnection(Email email, String userID,
 			String Password) {
@@ -93,7 +110,8 @@ public class SmtpServer extends Thread {
 				String op[] = Domains.getServerPortIP(email.getSenderAddress(),
 						email.getReceiverAddress().get(0));
 				socket = new Socket(op[0], Integer.parseInt(op[1]));
-				new Outgoing(socket, serverName, email, userID, Password);
+				new OutgoingSmtpConnection(socket, serverName, email, userID,
+						Password);
 			} else if (userID.contains(Domains.GMAIL_DOMAIN)) {
 				SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory
 						.getDefault();
@@ -102,11 +120,10 @@ public class SmtpServer extends Thread {
 				SSLSocket sslSocket = (SSLSocket) sslsocketfactory
 						.createSocket(op[0], Integer.parseInt(op[1]));
 
-				// imap.gmail.com
-
 				sslSocket.startHandshake();
 				socket = sslSocket;
-				new Outgoing(socket, serverName, email, userID, Password);
+				new OutgoingSmtpConnection(socket, serverName, email, userID,
+						Password);
 
 			}
 		} catch (IOException e) {
@@ -114,21 +131,11 @@ public class SmtpServer extends Thread {
 		}
 	}
 
-	public void sendMessage(Email email, String userID, String Password) {
-		try {
-			Socket client = new Socket("aspmx.l.google.com", 25);
-			new Outgoing(client, serverName, email, userID, Password);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 	/**
 	 * This method keeps track of the number of Active Users
 	 * 
 	 * @param userName
+	 *            Name of the user
 	 */
 	private void incrementAciveUsers(String userName) {
 		if (activeUsers.containsKey(userName)) {
@@ -141,6 +148,12 @@ public class SmtpServer extends Thread {
 
 	}
 
+	/**
+	 * Decrement active user count
+	 * 
+	 * @param userName
+	 *            Name of the user
+	 */
 	private void decrementActiveUsers(String userName) {
 		if (activeUsers.containsKey(userName)) {
 			int num = activeUsers.get(userName);
@@ -162,18 +175,6 @@ public class SmtpServer extends Thread {
 	}
 
 	/**
-	 * Please work
-	 */
-	public void testSendEmail() {
-		Email email = new Email();
-		email.setSenderAddress("krish@fcn.com");
-		email.setReceiverAddress("krish@example.com");
-		email.setSubject("Yes I am a genius");
-		email.setData("Sent from our code u can thank me");
-		this.outgoingSmtpServerConnection(email, "krish@fcn.com", "xxxx");
-	}
-
-	/**
 	 * This method accepts clients
 	 */
 	private void acceptClient() {
@@ -190,6 +191,9 @@ public class SmtpServer extends Thread {
 		}
 	}
 
+	/**
+	 * This method communicates wiith the client
+	 */
 	private void communicateWithClient() {
 		// System.out.println("in coom");
 		String usrIdPass[] = new String[2];
@@ -201,6 +205,7 @@ public class SmtpServer extends Thread {
 			@SuppressWarnings("unchecked")
 			HashMap<String, String> userIdPassword = (HashMap<String, String>) ois
 					.readObject();
+			// Authenticating
 			usrIdPass = authenticateUser(userIdPassword);
 			if (usrIdPass != null) {
 				this.incrementAciveUsers(usrIdPass[0]);
@@ -214,12 +219,9 @@ public class SmtpServer extends Thread {
 				oos.writeObject("NOTAUTHENTICATED");
 				return;
 			}
-
+			// Depending on whether he wants inbox or compose email
 			while (true) {
 				Object clientReq = (Object) ois.readObject();
-
-				// System.out.println("type Of class" + clientReq.getClass());
-				// //////////////////////
 				String classname = clientReq.getClass().getName();
 				if (classname.contains("java.lang.String")) {
 					if (clientReq.equals("close"))
@@ -238,7 +240,7 @@ public class SmtpServer extends Thread {
 			this.decrementActiveUsers(usrIdPass[0]);
 		} catch (IOException | ClassNotFoundException e) {
 			this.decrementActiveUsers(usrIdPass[0]);
-			e.printStackTrace();
+			System.out.println("Client has crashed!!!!!!!");
 		}
 	}
 
@@ -252,6 +254,7 @@ public class SmtpServer extends Thread {
 		for (Entry<String, String> entry : userIdPassword.entrySet()) {
 			String username = entry.getKey();
 			String password = entry.getValue();
+			// returns user name and password
 			try {
 				if (hosts.get(username).equals(password)) {
 					usr[0] = username;
@@ -272,17 +275,23 @@ public class SmtpServer extends Thread {
 	 */
 	private void addHosts() {
 		if (serverName.equals("fcn")) {
-			hosts.put("abc@fcn.com", "buddhi");
+			hosts.put("abc@fcn.com", "abc");
 			hosts.put("user@fcn.com", "user");
 			hosts.put("krish@fcn.com", "krish");
 			hosts.put("krishgodiawala@gmail.com", "xxxx");
 		} else if (serverName.equals("example")) {
 			hosts.put("fcn@example.com", "fcn");
-			hosts.put("krishgodiawala@gmail.com", "xxxx");
+			hosts.put("abc@example.com", "abc");
 		}
 
 	}
 
+	/**
+	 * TO return the inbox of the user.
+	 * 
+	 * @param username
+	 *            The name of the user.
+	 */
 	private void sendInbox(String username) {
 		System.out.println("sending");
 		try {
@@ -293,7 +302,6 @@ public class SmtpServer extends Thread {
 				oos.writeObject(listOfEmail.get(username));
 				oos.flush();
 			} else {
-				// System.out.println("writing object");
 				HashMap<Integer, Email> temp = new HashMap<Integer, Email>();
 				oos.writeObject(temp);
 				oos.flush();

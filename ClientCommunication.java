@@ -33,6 +33,9 @@ public class ClientCommunication extends Thread {
 
 	}
 
+	/**
+	 * Communicate with SMTP server
+	 */
 	@SuppressWarnings("finally")
 	public String communicate(String username, String password, String ServerIP)
 			throws UnknownHostException, IOException, ClassNotFoundException {
@@ -76,12 +79,14 @@ public class ClientCommunication extends Thread {
 
 	}
 
+	/**
+	 * Send email packet to SMTP server
+	 */
 	@SuppressWarnings("finally")
 	public boolean sendEmail(Email email) {
 		boolean isSent = false;
 		try {
 			oos.writeObject(email);
-			System.out.println("YUP sent");
 			isSent = true;
 		} catch (ConnectException ex) {
 			isSent = false;
@@ -95,6 +100,9 @@ public class ClientCommunication extends Thread {
 
 	}
 
+	/**
+	 * Fetch Email from the SMTP Server Message Queue
+	 */
 	public HashMap<Integer, Email> fetchMail(String username) {
 		Map<Integer, Email> serverInObject = new HashMap<Integer, Email>();
 		Email dummyEmail = new Email();
